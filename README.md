@@ -58,27 +58,11 @@ Read the **decomposition, not the total**. Total VaR barely moves because two ro
 
 ## Methodology
 
-**The discount curve.** Overnight index swap (OIS) quotes out to 6 months invert directly to discount factors. Par swap rates from 1Y to 30Y are bootstrapped from the condition that a par swap prices to zero. Because the quotes are not consecutive (5Y, then 7Y, then 10Y), the 7Y point needs a 6Y discount factor that must be interpolated from a 7Y point not yet solved. That circularity is resolved by sweeping the whole curve until it stops moving, a fixed point iteration converging in 16 passes. Interpolation is log linear in the discount factor, equivalently linear in the zero rate, which keeps forward rates smooth.
+From Fabozzi's *Handbook of Fixed Income Securities* (Chapters 37 and 39), I took the binomial lattice for valuing bonds with a call option, the calibration method that keeps the tree arbitrage free, option adjusted spread, and effective duration and convexity, and checked each one against the book's own worked examples. 
 
-**Bond and swap pricing.** Bonds are priced off the curve with real settlement dates and act/act accrued interest, so mid period settlement is handled properly. Yield to maturity is then solved by root finding as the flat rate reproducing that price, making yield an output rather than an input. Swaps use the telescoping floating leg identity, so no forward projection is needed on a single curve.
+`market_data.csv` is an **illustrative** set of quotes. The levels and curve shape are realistic (SOFR OIS out to 6 months, par swap rates from 1Y to 30Y), which is all the study needs, since its conclusions come from the *shape* of a callable's rate sensitivity rather than from any particular rate level.
 
-**Callable bonds.** A callable's cash flows are state dependent, so there is nothing to discount until future rates are modelled. This uses a Black-Derman-Toy style binomial short rate lattice with nodes spaced `r_j = r_low · exp(2jσ)`, making rates lognormal. Each time step is calibrated by solving for the single unknown low rate that makes a par bond of that maturity value back to 100 on the tree built so far, which is what makes the tree arbitrage free. Valuation rolls backward from maturity, and the embedded option is one line: the issuer caps each node at the call price, an investor would floor it at the put price.
-
-**Option adjusted spread.** The constant spread added to every node that reconciles model price with market price, solved by root finding.
-
-**Risk measurement.** Effective duration and key rate durations are computed by bumping the curve and **fully rebuilding and repricing the tree**, never by an analytic formula, since analytic duration assumes cash flows that do not move. The option adjusted spread is held constant across bumps.
-
-**The hedge.** The book's aggregate KRD vector is the hedging target. A swap of tenor T has exactly zero sensitivity beyond T, so ordering the pillars longest to shortest makes the sensitivity matrix triangular and the notionals solve by back substitution, exactly rather than by least squares fitting.
-
-**VaR.** Historical simulation over 500 daily scenarios, with the four bonds fully revalued on the lattice in every scenario and swap profit and loss entering at first order through KRD. Rate and spread factors are simulated separately so their contributions can be read apart. Reported with expected shortfall and a Basel style exception count.
-
-**Validation.** The lattice, OAS solver and effective duration are checked against worked examples in Fabozzi's *Handbook of Fixed Income Securities*, Chapter 37 (Fabozzi, Kalotay and Dorigan) and Chapter 39 (Audley, Chin and Ramamurthy). The tree reproduces Exhibit 37-9 node by node, and the option free, callable and putable prices (104.643, 102.899, 105.327), the 35bp OAS example and an effective duration of 2.24 all match. Notebook 1 shows those checks.
-
-## About the data
-
-`market_data.csv` is an **illustrative** set of quotes, not a market snapshot. The levels and curve shape are realistic (SOFR OIS out to 6 months, par swap rates from 1Y to 30Y), which is all the study needs, since its conclusions come from the *shape* of a callable's rate sensitivity rather than from any particular rate level. To run on real data, replace the file with quotes in the same four column format (`Tenor, Years, Rate (%), Instrument`) and rerun. Nothing else changes.
-
-The four bonds in the portfolio are likewise constructed rather than real issues, chosen to differ in coupon, spread, maturity and call schedule so that their risk profiles genuinely conflict.
+The four bonds in the portfolio are likewise constructed, chosen to differ in coupon, spread, maturity and call schedule so that their risk profiles genuinely conflict.
 
 ## Limitations
 
