@@ -41,11 +41,11 @@ Read the **decomposition, not the total**. Total VaR barely moves because two ro
 
 1. The bond studied here is a five year, non call two (5NC2). Its option adjusted DV01 is $2,452 against $4,145 for the same bond without the call, so 59% of a bullet's rate risk. But bucketing that risk along the curve shows it concentrated at the **1Y** point, with almost nothing at the **2Y** call date. A naive hedge sized on total DV01 and placed at the call date therefore fails at the wrong *pillar*, not merely at the wrong size: it creates a short where no risk existed while leaving the real exposure open.
 
-2. Four callables with four different call schedules put their risk in four different places on the curve, and no single tenor swap could hedge more than one of them. Summing their key rate duration (KRD) reports collapses the book into one row of five numbers that four swaps cancel exactly.
+2. Four callables with four different call schedules put their risk in four different places on the curve, and you need multiple swaps to hedge the risk on the curve. Summing their key rate duration (KRD) reports collapses the book into one row of five numbers that four swaps cancel.
+  
+3.  Widen every issuer's credit spread by 300bp with **no interest rate moving at all**, and the book's DV01 walks from $8,606 to $10,128 while the swap strip stays frozen at $8,617. The cause is the coupling: spreads move the call's moneyness, which moves the expected life of the bonds, which moves their rate sensitivity, and the swaps cannot see any of it. No static sizing fixes this. You either rebalance or you buy the optionality back and pay the premium.
 
-3. Widen every issuer's credit spread by 300bp with **no interest rate moving at all**, and the book's DV01 walks from $8,606 to $10,128 while the swap strip stays frozen at $8,617. A $1,511 per basis point exposure opens up without a single day of profit and loss to warn you. The cause is the coupling: spreads move the call's moneyness, which moves the expected life of the bonds, which moves their rate sensitivity, and the swaps cannot see any of it. No static sizing fixes this. You either rebalance or you buy the optionality back and pay the premium.
-
-**And rebalancing is cheap.** Re-solving the strip quarterly through a year of steadily widening spreads costs roughly $949 on a $36.7M book, about 0.3bp of market value annually, against $97.8k of daily rate VaR removed. A Bermudan swaption overlay would hedge the option exactly and need no rebalancing, but charges its premium up front with a wide bid/ask and thin liquidity in EM sizes. The strip converts that premium into a small running cost.
+  **And rebalancing is cheap.** Re-solving the strip quarterly through a year of steadily widening spreads costs roughly $949 on a $36.7M book, about 0.3bp of market value annually, against $97.8k of daily rate VaR removed. A Bermudan swaption overlay would hedge the option exactly and need no rebalancing, but charges its premium up front with a wide bid/ask and thin liquidity in EM sizes. The strip converts that premium into a small running cost.
 
 ## Repository contents
 
