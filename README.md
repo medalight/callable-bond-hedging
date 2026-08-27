@@ -87,3 +87,7 @@ Run the notebooks from the repository root so `market_data.csv` and `fixed_incom
 ## A note on how this was built
 
 The thesis, the modelling approach, the validation against published examples and the interpretation of every result are my own. I used Claude (Anthropic) as a coding assistant to implement the Python, build the visualisations and iterate on structure. All numbers were checked against the textbook's worked examples before being trusted.
+
+## Acknowledgments
+
+This project exists because of Howard, a colleague and mentor whose curiosity is genuinely contagious. Talking with him is what got me interested in this corner of fixed income in the first place, and the way he thinks about hedging callable bonds shaped this whole approach. I don't think I'd have framed the problem this way, or wanted to dig into it at all, without our conversations.
