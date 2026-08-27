@@ -1,16 +1,16 @@
 # Hedging a Book of (EM) Callable Bonds
 
-Can you strip the interest rate risk out of a portfolio of emerging market callable bonds using nothing but plain vanilla interest rate swaps? This project builds the pricing machinery to answer that quantitatively, and finds that you can remove around **95% of the book's interest rate risk with vanilla/liquid swap trades**.
+Can a portfolio of emerging-market callable bonds be immunized against interest-rate risk using only liquid, plain-vanilla interest rate swaps, while preserving its intended credit spread exposure? This project tackles the portfolio immunization problem by building a callable-bond pricing and risk framework, then constructing a key-rate-duration-matched swap hedge. Applied to a High Yield callable bond portfolio, the strategy removes approximately 95% of the book’s interest-rate VaR using only vanilla swap trades.
 
 ---
 
 ## The problem
 
-A AAA rated institution funds itself at SOFR flat and buys emerging market (EM) callable bonds. The credit risk is deliberate: it is the mandate, and it is how the desk earns its spread. What it wants to remove is the interest rate risk.
+A AAA rated institution funds itself at SOFR flat and buys emerging market (EM) bermudan-style callable bonds. The institution has a mandate of bearing the credit risk, but wants to hedge the interest rate risk.
 
 A callable bond's call decision depends on **two stochastic factors**, interest rates *and* the issuer's credit spread. An interest rate swap sees only one of them. In principle you cannot fully hedge an option that depends on two factors with an instrument that responds to one.
 
-The practical answer is not to hedge each bond's embedded option. It is to **aggregate the whole book's rate risk into buckets along the curve and immunize those buckets with a strip of vanilla swaps**, then rebalance as the immunization decays.
+The practical answer is not to hedge each bond's embedded option, but to **aggregate the whole book's rate risk into buckets along the curve and immunize those buckets with a strip of vanilla swaps**, then rebalance as the immunization decays.
 
 ## Why not just hedge the option directly
 
@@ -22,7 +22,7 @@ For a AAA to A+ issuer this mismatch barely matters since spread is stable, so t
 
 For a high yield or EM issuer it does matter. Take a scenario where rates fall and the credit spread widens or holds. On rates alone, cancelling the swap looks optimal. But the bond is not actually going to be called, because the wider spread kills the issuer's refinancing math. The hedge switches itself off exactly when the underlying rate risk is still there, leaving a choice between re-hedging at the new lower rate (a loss if rates keep falling) or not re-hedging (unprotected if rates snap back). High yield bonds compound this with step down call premiums, designed to make early calls expensive and unlikely, a feature a standard Bermudan swaption has no way to represent, since its strike cannot vary with time.
 
-That is the starting point of this project. Trying to hedge the option itself introduces a second, harder mismatch on top of the first. The simpler approach, hedge the book's rate risk with vanilla swaps and leave the credit risk alone, gives up on being exact but avoids ever exercising on the wrong signal, since a vanilla swap has no optionality to mistime in the first place. What it costs instead is the rebalancing this project goes on to measure.
+The simpler approach, hedge the book's rate risk with vanilla swaps and leave the credit risk alone, gives up on being exact but avoids exercising on the wrong signal.
 
 ## The result
 
