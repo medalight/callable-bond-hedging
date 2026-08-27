@@ -1,6 +1,6 @@
 # Hedging a Book of Callable Bonds
 
-Can you strip the interest rate risk out of a portfolio of emerging market callable bonds using nothing but plain vanilla interest rate swaps? This project builds the pricing machinery to answer that quantitatively, and finds that you can remove **95% of the book's interest rate risk with vanilla/liquid/cheap swap trades**.
+Can you strip the interest rate risk out of a portfolio of emerging market callable bonds using nothing but plain vanilla interest rate swaps? This project builds the pricing machinery to answer that quantitatively, and finds that you can remove around **95% of the book's interest rate risk with vanilla/liquid/cheap swap trades**.
 
 ---
 
@@ -35,7 +35,7 @@ That is the starting point of this project. Trying to hedge the option itself in
 
 Four liquid trades remove 95% of the interest rate risk and leave the credit risk, the risk the portfolio exists to hold, untouched to the dollar.
 
-Read the **decomposition, not the total**. Total VaR barely moves because two roughly independent risks combine close to quadrature, so removing the rate leg entirely just drops the total to the spread floor. A hedge that drove total VaR to zero would mean the mandate had been hedged away by mistake.
+Total VaR barely moves because two roughly independent risks combine close to quadrature, so removing the rate leg entirely just drops the total to the spread floor. A hedge that drove total VaR to zero would mean the mandate had been hedged away by mistake.
 
 ## Three findings worth stating
 
@@ -68,9 +68,9 @@ The four bonds in the portfolio are likewise constructed, chosen to differ in co
 
 The limitations are discussed at length in Notebook 2 and are worth reading before quoting any number here. The most important:
 
-- **Credit is modelled as a spread, never as a default.** Issuer curves are the SOFR curve plus a flat spread. There is no hazard rate, default probability, recovery assumption or CDS curve. What is computed is therefore **spread VaR**, mark to market repricing risk, and never credit VaR. Real credit loss is skewed and fat tailed in a way no Gaussian spread shock reaches, so this is a floor on the true risk rather than a measure of it.
+- **Credit is modelled as a spread (not as a default).** Issuer curves are the SOFR curve plus a flat spread. There is no hazard rate, default probability, recovery assumption or CDS curve... What is computed is therefore **spread VaR**, mark to market repricing risk, and never credit VaR. Real credit loss is skewed and fat tailed.
 - **Volatility is assumed.** 15%, at every rate level. It is also the single most price sensitive input in the model.
-- **One factor in the tree**, even though the entire thesis is that the problem has two. Spread enters as an exogenous shift, capturing levels but not dynamics.
+- **One factor in the tree.** The lattice only lets the short rate move, up or down at each node. Credit spread is added as a flat number on top, chosen before the tree is built, so it never branches and carries no volatility of its own. That means the model can compare different spread *levels* but has no way to represent spread *moving*, or the issuer's exercise decision reacting to the chance that it might. Real EM spreads move on their own and often with rates, and neither is captured here.
 - **The VaR history is synthetic.** Gaussian factors, chosen rather than estimated, so every VaR figure is conditional on that calibration and is not an empirical estimate.
 
 None of these change the qualitative conclusion, because the two factor structure of the residual is a property of the instrument rather than of the model. They would move the magnitudes.
