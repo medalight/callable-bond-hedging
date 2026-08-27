@@ -1,4 +1,4 @@
-# Hedging a Book of Callable Bonds
+# Hedging a Book of (EM) Callable Bonds
 
 Can you strip the interest rate risk out of a portfolio of emerging market callable bonds using nothing but plain vanilla interest rate swaps? This project builds the pricing machinery to answer that quantitatively, and finds that you can remove around **95% of the book's interest rate risk with vanilla/liquid/cheap swap trades**.
 
