@@ -85,7 +85,7 @@ The four bonds in the portfolio are likewise constructed rather than real issues
 The limitations are discussed at length in Notebook 2 and are worth reading before quoting any number here. The most important:
 
 - **Credit is modelled as a spread, never as a default.** Issuer curves are the SOFR curve plus a flat spread. There is no hazard rate, default probability, recovery assumption or CDS curve. What is computed is therefore **spread VaR**, mark to market repricing risk, and never credit VaR. Real credit loss is skewed and fat tailed in a way no Gaussian spread shock reaches, so this is a floor on the true risk rather than a measure of it.
-- **Volatility is assumed, not calibrated.** One number, 15%, at every rate level. It is also the single most price sensitive input in the model.
+- **Volatility is assumed.** 15%, at every rate level. It is also the single most price sensitive input in the model.
 - **One factor in the tree**, even though the entire thesis is that the problem has two. Spread enters as an exogenous shift, capturing levels but not dynamics.
 - **The VaR history is synthetic.** Gaussian factors, chosen rather than estimated, so every VaR figure is conditional on that calibration and is not an empirical estimate.
 
