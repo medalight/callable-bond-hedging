@@ -86,7 +86,7 @@ Run the notebooks from the repository root so `market_data.csv` and `fixed_incom
 
 ## A note on how this was built
 
-The thesis, the modelling approach, the validation against published examples and the interpretation of every result are my own. I used Claude (Anthropic) as a coding assistant to implement the Python, build the visualisations and iterate on structure. All numbers were checked against the textbook's worked examples before being trusted.
+The thesis, the modelling approach, the validation against published examples and the interpretation of every result are my own. I used Claude (Anthropic) as a coding assistant to implement the Python, build the visualisations and iterate on structure.
 
 ## Acknowledgments
 
