@@ -1,16 +1,16 @@
 # Hedging a Book of (EM) Callable Bonds
 
-Can a portfolio of emerging-market callable bonds be immunized against interest-rate risk using only liquid, plain-vanilla interest rate swaps, while preserving its intended credit spread exposure? This project tackles the portfolio immunization problem by building a callable-bond pricing and risk framework, then constructing a key-rate-duration-matched swap hedge. Applied to a High Yield callable bond portfolio, the strategy removes approximately 95% of the book’s interest-rate VaR using only vanilla swap trades.
+Can a portfolio of EM callable bonds be immunized against interest-rate risk using only liquid, plain-vanilla interest rate swaps, while preserving its intended credit spread exposure? This project tackles the portfolio immunization problem by building a callable-bond pricing and risk framework, then constructing a key-rate-duration-matched swap hedge. Applied to a High Yield callable bond portfolio, the strategy removes approximately 95% of the book’s interest-rate VaR using only vanilla swap trades.
 
 ---
 
 ## The problem
 
-A AAA rated institution funds itself at SOFR flat and buys emerging market (EM) bermudan-style callable bonds. The institution has a mandate of bearing the credit risk, but wants to hedge the interest rate risk.
+A AAA rated institution funds itself at SOFR flat and buys EM bermudan-style callable bonds. The institution has a mandate/wants to bear the credit risk, but wants to hedge the interest rate risk.
 
 A callable bond's call decision depends on **two stochastic factors**, interest rates *and* the issuer's credit spread. An interest rate swap sees only one of them. In principle you cannot fully hedge an option that depends on two factors with an instrument that responds to one.
 
-The practical answer is not to hedge each bond's embedded option, but to **aggregate the whole book's rate risk into buckets along the curve and immunize those buckets with a strip of vanilla swaps**, then rebalance as the immunization decays.
+The practical answer is to **aggregate the whole book's rate risk into buckets along the curve and immunize those buckets with a strip of vanilla swaps**, then rebalance as the immunization decays.
 
 ## Why not just hedge the option directly
 
@@ -20,11 +20,13 @@ However, the Bermudan swaption's exercise decision, cancel the swap or keep it, 
 
 For a AAA to A+ issuer this mismatch barely matters since spread is stable, so the two exercise boundaries stay close together and a rates driven Bermudan tracks the bond well.
 
-For a high yield or EM issuer it does matter. Take a scenario where rates fall and the credit spread widens or holds. On rates alone, cancelling the swap looks optimal. But the bond is not actually going to be called, because the wider spread kills the issuer's refinancing math. The hedge switches itself off exactly when the underlying rate risk is still there, leaving a choice between re-hedging at the new lower rate (a loss if rates keep falling) or not re-hedging (unprotected if rates snap back). High yield bonds compound this with step down call premiums, designed to make early calls expensive and unlikely, a feature a standard Bermudan swaption has no way to represent, since its strike cannot vary with time.
+For a high yield or EM issuer it does matter. Take a scenario where rates fall and the credit spread widens or holds. On rates alone, cancelling the swap looks optimal. But the bond is not going to be called, because the wider spread kills the issuer's refinancing math. The hedge switches itself off exactly when the underlying rate risk is still there, leaving a choice between re-hedging at the new lower rate (a loss if rates keep falling) or not re-hedging (unprotected if rates snap back). 
+
+HY bonds compound this with step down call premiums, designed to make early calls more expensive, which is a feature a standard Bermudan swaption cannot represent, since its strike cannot vary with time.
 
 The simpler approach, hedge the book's rate risk with vanilla swaps and leave the credit risk alone, gives up on being exact but avoids exercising on the wrong signal.
 
-## The result
+## Results
 
 99% one day value at risk (VaR) on a $36M book of four EM callable bonds:
 
@@ -41,9 +43,9 @@ Total VaR barely moves because two roughly independent risks combine close to qu
 
 1. The bond studied here is a five year, non call two (5NC2). Its option adjusted DV01 is $2,452 against $4,145 for the same bond without the call, so 59% of a bullet's rate risk. But bucketing that risk along the curve shows it concentrated at the **1Y** point, with almost nothing at the **2Y** call date. A naive hedge sized on total DV01 and placed at the call date therefore fails at the wrong *pillar*, not merely at the wrong size: it creates a short where no risk existed while leaving the real exposure open.
 
-2. Four callables with four different call schedules put their risk in four different places on the curve, and you need multiple swaps to hedge the risk on the curve. Summing their key rate duration (KRD) reports collapses the book into one row of five numbers that four swaps cancel.
+2. Four callables with different call schedules put their risk in four different places on the curve, and you need multiple swaps to hedge the risk on the curve. Summing their key rate duration (KRD) reports collapses the book into one row of five numbers that four swaps cancel.
   
-3.  Widen every issuer's credit spread by 300bp with **no interest rate moving at all**, and the book's DV01 walks from $8,606 to $10,128 while the swap strip stays frozen at $8,617. The cause is the coupling: spreads move the call's moneyness, which moves the expected life of the bonds, which moves their rate sensitivity, and the swaps cannot see any of it. No static sizing fixes this. You either rebalance or you buy the optionality back and pay the premium.
+3.  When you widen every issuer's credit spread by 300bp with **no interest rate moving at all**, and the book's DV01 walks from $8,606 to $10,128 while the swap strip stays at $8,617. Two reasons: spreads move the call's moneyness, which moves the expected life of the bonds, which moves their rate sensitivity, and the swaps cannot see any of it. You need to rebalance back to hedge the gamma.
 
   **And rebalancing is cheap.** Re-solving the strip quarterly through a year of steadily widening spreads costs roughly $949 on a $36.7M book, about 0.3bp of market value annually, against $97.8k of daily rate VaR removed. A Bermudan swaption overlay would hedge the option exactly and need no rebalancing, but charges its premium up front with a wide bid/ask and thin liquidity in EM sizes. The strip converts that premium into a small running cost.
 
